@@ -1,0 +1,26 @@
+{
+  "name": "webgenda",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "npm run dev --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JesusFG-32/webgenda.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JesusFG-32/webgenda/issues"
+  },
+  "homepage": "https://github.com/JesusFG-32/webgenda#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
