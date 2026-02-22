@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const TaskForm = ({ onTaskAdded }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+    const [priority, setPriority] = useState('media');
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -10,9 +11,10 @@ const TaskForm = ({ onTaskAdded }) => {
         if (!title.trim()) return;
 
         setLoading(true);
-        await onTaskAdded({ title: title.trim(), description: description.trim() });
+        await onTaskAdded({ title: title.trim(), description: description.trim(), priority });
         setTitle('');
         setDescription('');
+        setPriority('media');
         setLoading(false);
     };
 
@@ -35,9 +37,23 @@ const TaskForm = ({ onTaskAdded }) => {
                 rows="2"
                 disabled={loading}
             ></textarea>
-            <button type="submit" className="btn-primary" disabled={loading || !title.trim()}>
-                {loading ? 'Agregando...' : 'Agregar Tarea'}
-            </button>
+
+            <div className="task-form-footer">
+                <select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
+                    className="priority-select"
+                    disabled={loading}
+                >
+                    <option value="baja">Prioridad: Baja</option>
+                    <option value="media">Prioridad: Media</option>
+                    <option value="alta">Prioridad: Alta</option>
+                </select>
+
+                <button type="submit" className="btn-primary" disabled={loading || !title.trim()}>
+                    {loading ? 'Agregando...' : 'Agregar Tarea'}
+                </button>
+            </div>
         </form>
     );
 };

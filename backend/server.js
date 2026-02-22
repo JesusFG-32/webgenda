@@ -53,11 +53,19 @@ const checkDatabaseAndStart = async () => {
                 user_id INT NOT NULL,
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
+                priority ENUM('baja', 'media', 'alta') DEFAULT 'media',
                 is_completed BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
             )
         `);
+        // Asegurarse de agregar la columna si la tabla ya existía
+        try {
+            await pool.query('ALTER TABLE Tasks ADD COLUMN priority ENUM("baja", "media", "alta") DEFAULT "media"');
+        } catch (alterError) {
+            // Ignorar error si la columna ya existe
+            if (alterError.code !== 'ER_DUP_FIELDNAME') throw alterError;
+        }
         console.log('✅ Tabla "Tasks" verificada.');
 
         app.listen(PORT, () => {

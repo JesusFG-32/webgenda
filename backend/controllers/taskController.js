@@ -14,16 +14,17 @@ const getTasks = async (req, res) => {
 };
 
 const createTask = async (req, res) => {
-    const { title, description } = req.body;
+    const { title, description, priority } = req.body;
 
     if (!title) {
         return res.status(400).json({ message: 'El título es obligatorio.' });
     }
 
     try {
+        const taskPriority = priority || 'media';
         const [result] = await pool.query(
-            'INSERT INTO Tasks (user_id, title, description) VALUES (?, ?, ?)',
-            [req.user.id, title, description || null]
+            'INSERT INTO Tasks (user_id, title, description, priority) VALUES (?, ?, ?, ?)',
+            [req.user.id, title, description || null, taskPriority]
         );
 
         const newTask = {
@@ -31,6 +32,7 @@ const createTask = async (req, res) => {
             user_id: req.user.id,
             title,
             description: description || null,
+            priority: taskPriority,
             is_completed: 0,
             created_at: new Date().toISOString()
         };
@@ -44,7 +46,7 @@ const createTask = async (req, res) => {
 
 const updateTask = async (req, res) => {
     const taskId = req.params.id;
-    const { title, description, is_completed } = req.body;
+    const { title, description, is_completed, priority } = req.body;
 
     try {
         const [tasks] = await pool.query('SELECT * FROM Tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
@@ -57,17 +59,19 @@ const updateTask = async (req, res) => {
         const updatedTitle = title !== undefined ? title : task.title;
         const updatedDescription = description !== undefined ? description : task.description;
         const updatedIsCompleted = is_completed !== undefined ? is_completed : task.is_completed;
+        const updatedPriority = priority !== undefined ? priority : task.priority;
 
         await pool.query(
-            'UPDATE Tasks SET title = ?, description = ?, is_completed = ? WHERE id = ?',
-            [updatedTitle, updatedDescription, updatedIsCompleted, taskId]
+            'UPDATE Tasks SET title = ?, description = ?, is_completed = ?, priority = ? WHERE id = ?',
+            [updatedTitle, updatedDescription, updatedIsCompleted, updatedPriority, taskId]
         );
 
         res.json({
             ...task,
             title: updatedTitle,
             description: updatedDescription,
-            is_completed: updatedIsCompleted
+            is_completed: updatedIsCompleted,
+            priority: updatedPriority
         });
     } catch (error) {
         console.error(error);

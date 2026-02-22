@@ -4,10 +4,11 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description || '');
+    const [editPriority, setEditPriority] = useState(task.priority || 'media');
 
     const handleSave = () => {
         if (!editTitle.trim()) return;
-        onEdit(task.id, { title: editTitle, description: editDescription });
+        onEdit(task.id, { title: editTitle, description: editDescription, priority: editPriority });
         setIsEditing(false);
     };
 
@@ -27,6 +28,15 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
                     className="task-edit-desc"
                     rows="2"
                 />
+                <select
+                    value={editPriority}
+                    onChange={(e) => setEditPriority(e.target.value)}
+                    className="priority-select"
+                >
+                    <option value="baja">Baja</option>
+                    <option value="media">Media</option>
+                    <option value="alta">Alta</option>
+                </select>
                 <div className="task-actions">
                     <button onClick={handleSave} className="btn-success">Guardar</button>
                     <button onClick={() => setIsEditing(false)} className="btn-secondary">Cancelar</button>
@@ -46,6 +56,9 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
                         className="task-checkbox"
                     />
                     <h3 className="task-title">{task.title}</h3>
+                    <span className={`task-badge badge-${task.priority || 'media'}`}>
+                        {task.priority || 'media'}
+                    </span>
                 </div>
                 {task.description && <p className="task-desc">{task.description}</p>}
                 <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
