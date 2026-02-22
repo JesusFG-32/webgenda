@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const pool = require('./config/db');
+const { pool, initializeDatabase } = require('./config/db');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -32,8 +32,10 @@ const checkDatabaseAndStart = async () => {
     try {
         console.log('⏳ Verificando conexión a la base de datos...');
 
-        await pool.query('SELECT 1');
-        console.log('✅ Conexión a MariaDB exitosa.');
+        console.log('⏳ Verificando y creando base de datos si no existe...');
+        await initializeDatabase();
+
+        console.log('✅ Base de datos seleccionada y conexión exitosa.');
         await pool.query(`
             CREATE TABLE IF NOT EXISTS Users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
