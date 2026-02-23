@@ -4,6 +4,7 @@ import Login from './modules/auth/components/Login';
 import Register from './modules/auth/components/Register';
 import TasksDashboard from './modules/tasks/components/TasksDashboard';
 import ProtectedRoute from './modules/auth/components/ProtectedRoute';
+import GithubCallback from './modules/auth/components/GithubCallback';
 import ThemeToggle from './components/ThemeToggle';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/" element={<Navigate to="/tasks" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/login/github/callback" element={<GithubCallback />} />
 
         <Route
           path="/tasks"

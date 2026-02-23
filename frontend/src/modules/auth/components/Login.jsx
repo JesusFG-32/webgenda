@@ -27,8 +27,14 @@ const Login = () => {
     };
 
     const handleGithubLogin = () => {
-        //TODO: Implementar autenticación con GitHub
-        alert('Autenticación con GitHub estará disponible pronto.');
+        const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
+        if (!clientId) {
+            alert('Falta configurar VITE_GITHUB_CLIENT_ID en el archivo .env del frontend.');
+            return;
+        }
+        const redirectUri = `${window.location.origin}/app/task/login/github/callback`;
+        const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
+        window.location.href = githubAuthUrl;
     };
 
     return (
