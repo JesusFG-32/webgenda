@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, title, onToggle, onDelete, onEdit }) => {
+const TaskList = ({ tasks, title, onToggle, onDelete, onEdit, onView }) => {
     return (
         <div className="task-list-section">
             <h2 className="section-title">{title} ({tasks.length})</h2>
@@ -17,6 +17,7 @@ const TaskList = ({ tasks, title, onToggle, onDelete, onEdit }) => {
                             onToggle={onToggle}
                             onDelete={onDelete}
                             onEdit={onEdit}
+                            onView={onView}
                         />
                     ))}
                 </div>

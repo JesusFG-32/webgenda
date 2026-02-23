@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description || '');
@@ -47,8 +47,12 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
 
     return (
         <div className={`task-item ${task.is_completed ? 'completed' : ''}`}>
-            <div className="task-content">
-                <div className="task-header">
+            <div
+                className="task-content"
+                onClick={() => onView && onView(task)}
+                title="Haz clic para ver más detalles"
+            >
+                <div className="task-header" onClick={(e) => e.stopPropagation()}>
                     <input
                         type="checkbox"
                         checked={!!task.is_completed}
@@ -64,7 +68,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }) => {
                 <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
             </div>
 
-            <div className="task-actions">
+            <div className="task-actions" onClick={(e) => e.stopPropagation()}>
                 <button onClick={() => setIsEditing(true)} className="btn-edit" aria-label="Editar">✏️</button>
                 <button onClick={() => onDelete(task.id)} className="btn-delete" aria-label="Eliminar">🗑️</button>
             </div>

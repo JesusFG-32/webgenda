@@ -3,12 +3,14 @@ import { AuthContext } from '../../auth/AuthContext';
 import api from '../services/api';
 import TaskForm from './TaskForm';
 import TaskList from './TaskList';
+import TaskDetailsModal from './TaskDetailsModal';
 
 const TasksDashboard = () => {
     const { user, logout } = useContext(AuthContext);
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [selectedTask, setSelectedTask] = useState(null);
 
     useEffect(() => {
         fetchTasks();
@@ -47,6 +49,11 @@ const TasksDashboard = () => {
         try {
             const response = await api.put(`/tasks/${id}`, updatedData);
             setTasks(tasks.map(task => task.id === id ? { ...task, ...response.data } : task));
+
+            // Si la tarea editada es la que está abierta en el modal, actualízala también
+            if (selectedTask && selectedTask.id === id) {
+                setSelectedTask({ ...selectedTask, ...response.data });
+            }
         } catch (err) {
             alert('Error al editar la tarea.');
         }
@@ -58,9 +65,22 @@ const TasksDashboard = () => {
         try {
             await api.delete(`/tasks/${id}`);
             setTasks(tasks.filter(task => task.id !== id));
+
+            // Si la tarea eliminada es la que está abierta, cierra el modal
+            if (selectedTask && selectedTask.id === id) {
+                setSelectedTask(null);
+            }
         } catch (err) {
             alert('Error al eliminar la tarea.');
         }
+    };
+
+    const handleViewTask = (task) => {
+        setSelectedTask(task);
+    };
+
+    const closeTaskDetails = () => {
+        setSelectedTask(null);
     };
 
     const pendingTasks = tasks.filter(task => !task.is_completed);
@@ -92,6 +112,7 @@ const TasksDashboard = () => {
                         onToggle={handleToggleTask}
                         onDelete={handleDeleteTask}
                         onEdit={handleEditTask}
+                        onView={handleViewTask}
                     />
                     <TaskList
                         title="Completadas"
@@ -99,9 +120,18 @@ const TasksDashboard = () => {
                         onToggle={handleToggleTask}
                         onDelete={handleDeleteTask}
                         onEdit={handleEditTask}
+                        onView={handleViewTask}
                     />
                 </div>
             </main>
+
+            {/* Modal de detalles de tarea */}
+            {selectedTask && (
+                <TaskDetailsModal
+                    task={selectedTask}
+                    onClose={closeTaskDetails}
+                />
+            )}
         </div>
     );
 };
