@@ -14,7 +14,7 @@ const getTasks = async (req, res) => {
 };
 
 const createTask = async (req, res) => {
-    const { title, description, priority } = req.body;
+    const { title, description, priority, image_url } = req.body;
 
     if (!title) {
         return res.status(400).json({ message: 'El título es obligatorio.' });
@@ -23,8 +23,8 @@ const createTask = async (req, res) => {
     try {
         const taskPriority = priority || 'media';
         const [result] = await pool.query(
-            'INSERT INTO Tasks (user_id, title, description, priority) VALUES (?, ?, ?, ?)',
-            [req.user.id, title, description || null, taskPriority]
+            'INSERT INTO Tasks (user_id, title, description, priority, image_url) VALUES (?, ?, ?, ?, ?)',
+            [req.user.id, title, description || null, taskPriority, image_url || null]
         );
 
         const newTask = {
@@ -33,6 +33,7 @@ const createTask = async (req, res) => {
             title,
             description: description || null,
             priority: taskPriority,
+            image_url: image_url || null,
             is_completed: 0,
             created_at: new Date().toISOString()
         };
@@ -46,7 +47,7 @@ const createTask = async (req, res) => {
 
 const updateTask = async (req, res) => {
     const taskId = req.params.id;
-    const { title, description, is_completed, priority } = req.body;
+    const { title, description, is_completed, priority, image_url } = req.body;
 
     try {
         const [tasks] = await pool.query('SELECT * FROM Tasks WHERE id = ? AND user_id = ?', [taskId, req.user.id]);
@@ -60,10 +61,11 @@ const updateTask = async (req, res) => {
         const updatedDescription = description !== undefined ? description : task.description;
         const updatedIsCompleted = is_completed !== undefined ? is_completed : task.is_completed;
         const updatedPriority = priority !== undefined ? priority : task.priority;
+        const updatedImageUrl = image_url !== undefined ? image_url : task.image_url;
 
         await pool.query(
-            'UPDATE Tasks SET title = ?, description = ?, is_completed = ?, priority = ? WHERE id = ?',
-            [updatedTitle, updatedDescription, updatedIsCompleted, updatedPriority, taskId]
+            'UPDATE Tasks SET title = ?, description = ?, is_completed = ?, priority = ?, image_url = ? WHERE id = ?',
+            [updatedTitle, updatedDescription, updatedIsCompleted, updatedPriority, updatedImageUrl, taskId]
         );
 
         res.json({
@@ -71,7 +73,8 @@ const updateTask = async (req, res) => {
             title: updatedTitle,
             description: updatedDescription,
             is_completed: updatedIsCompleted,
-            priority: updatedPriority
+            priority: updatedPriority,
+            image_url: updatedImageUrl
         });
     } catch (error) {
         console.error(error);

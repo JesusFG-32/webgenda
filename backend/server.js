@@ -10,9 +10,15 @@ app.use(express.json());
 
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const path = require('path');
+const authenticateToken = require('./middleware/authMiddleware');
+
+app.use('/api/public', express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/upload', authenticateToken, uploadRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Webgenda Tasks API' });
@@ -59,11 +65,15 @@ const checkDatabaseAndStart = async () => {
                 FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
             )
         `);
-        // Asegurarse de agregar la columna si la tabla ya existía
         try {
             await pool.query('ALTER TABLE Tasks ADD COLUMN priority ENUM("baja", "media", "alta") DEFAULT "media"');
         } catch (alterError) {
-            // Ignorar error si la columna ya existe
+            if (alterError.code !== 'ER_DUP_FIELDNAME') throw alterError;
+        }
+
+        try {
+            await pool.query('ALTER TABLE Tasks ADD COLUMN image_url VARCHAR(255)');
+        } catch (alterError) {
             if (alterError.code !== 'ER_DUP_FIELDNAME') throw alterError;
         }
         console.log('✅ Tabla "Tasks" verificada.');

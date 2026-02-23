@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import api from '../services/api';
 
 const TaskForm = ({ onTaskAdded }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState('media');
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -11,10 +13,38 @@ const TaskForm = ({ onTaskAdded }) => {
         if (!title.trim()) return;
 
         setLoading(true);
-        await onTaskAdded({ title: title.trim(), description: description.trim(), priority });
+        let imageUrl = null;
+
+        if (image) {
+            const formData = new FormData();
+            formData.append('image', image);
+            try {
+                const uploadRes = await api.post('/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                imageUrl = uploadRes.data.imageUrl;
+            } catch (err) {
+                console.error("Error subiendo imagen", err);
+                alert("Hubo un error al subir la imagen.");
+                setLoading(false);
+                return;
+            }
+        }
+
+        await onTaskAdded({
+            title: title.trim(),
+            description: description.trim(),
+            priority,
+            image_url: imageUrl
+        });
+
         setTitle('');
         setDescription('');
         setPriority('media');
+        setImage(null);
+        // Reset file input
+        const fileInput = document.getElementById('task-image-upload');
+        if (fileInput) fileInput.value = '';
         setLoading(false);
     };
 
@@ -37,6 +67,17 @@ const TaskForm = ({ onTaskAdded }) => {
                 rows="2"
                 disabled={loading}
             ></textarea>
+
+            <div className="task-form-options">
+                <input
+                    type="file"
+                    id="task-image-upload"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    disabled={loading}
+                    className="task-input-file"
+                />
+            </div>
 
             <div className="task-form-footer">
                 <select

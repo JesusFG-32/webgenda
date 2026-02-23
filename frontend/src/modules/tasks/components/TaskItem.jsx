@@ -6,6 +6,13 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
     const [editDescription, setEditDescription] = useState(task.description || '');
     const [editPriority, setEditPriority] = useState(task.priority || 'media');
 
+    // Construir la URL completa para la imagen si existe
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        return `${apiUrl}/public${path}`;
+    };
+
     const handleSave = () => {
         if (!editTitle.trim()) return;
         onEdit(task.id, { title: editTitle, description: editDescription, priority: editPriority });
@@ -52,20 +59,32 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
                 onClick={() => onView && onView(task)}
                 title="Haz clic para ver más detalles"
             >
-                <div className="task-header" onClick={(e) => e.stopPropagation()}>
-                    <input
-                        type="checkbox"
-                        checked={!!task.is_completed}
-                        onChange={() => onToggle(task.id, !task.is_completed)}
-                        className="task-checkbox"
-                    />
-                    <h3 className="task-title">{task.title}</h3>
-                    <span className={`task-badge badge-${task.priority || 'media'}`}>
-                        {task.priority || 'media'}
-                    </span>
+                {task.image_url && (
+                    <div className="task-thumb-container">
+                        <img
+                            src={getImageUrl(task.image_url)}
+                            alt={`Imagen para ${task.title}`}
+                            className="task-thumb"
+                        />
+                    </div>
+                )}
+
+                <div className="task-info">
+                    <div className="task-header" onClick={(e) => e.stopPropagation()}>
+                        <input
+                            type="checkbox"
+                            checked={!!task.is_completed}
+                            onChange={() => onToggle(task.id, !task.is_completed)}
+                            className="task-checkbox"
+                        />
+                        <h3 className="task-title">{task.title}</h3>
+                        <span className={`task-badge badge-${task.priority || 'media'}`}>
+                            {task.priority || 'media'}
+                        </span>
+                    </div>
+                    {task.description && <p className="task-desc">{task.description}</p>}
+                    <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
                 </div>
-                {task.description && <p className="task-desc">{task.description}</p>}
-                <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
             </div>
 
             <div className="task-actions" onClick={(e) => e.stopPropagation()}>
