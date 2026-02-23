@@ -9,7 +9,10 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       host: env.VITE_HOST || true,
-      port: parseInt(env.VITE_PORT) || 3006
+      port: parseInt(env.VITE_PORT) || 3006,
+      hmr: {
+        path: '/app/task/',
+      }
     }
   }
 })
