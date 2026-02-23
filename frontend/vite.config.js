@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    base: '/app/task/',
     plugins: [react()],
     server: {
       host: env.VITE_HOST || true,

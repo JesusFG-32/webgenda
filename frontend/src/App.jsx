@@ -19,7 +19,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router basename="/app/task/">
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
       <Routes>
         <Route path="/" element={<Navigate to="/tasks" replace />} />
