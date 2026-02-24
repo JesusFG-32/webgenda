@@ -9,28 +9,28 @@ const GithubCallback = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const hasRequested = React.useRef(false);
+
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search);
         const code = urlParams.get('code');
 
         if (code) {
-            exchangeCodeForToken(code);
+            if (!hasRequested.current) {
+                hasRequested.current = true;
+                exchangeCodeForToken(code);
+            }
         } else {
             setStatus('Error: No se recibió ningún código de autorización de GitHub.');
             setTimeout(() => navigate('/login'), 3000);
         }
-    }, [location]);
+    }, [location.search]);
 
     const exchangeCodeForToken = async (code) => {
         try {
             const response = await api.post('/auth/github', { code });
-
-            // Iniciar sesión en el contexto global
             login(response.data.token, response.data.user);
-
             setStatus('¡Autenticación exitosa! Redirigiendo...');
-
-            // Pequeña pausa para mejorar la UX y redirigir al listado de tareas
             setTimeout(() => navigate('/tasks'), 1000);
         } catch (error) {
             console.error('Error durante el callback de GitHub:', error);
