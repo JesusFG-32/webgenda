@@ -5,6 +5,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description || '');
     const [editPriority, setEditPriority] = useState(task.priority || 'media');
+    const [editDueDate, setEditDueDate] = useState(task.due_date ? task.due_date.split('T')[0] : '');
 
     // Construir la URL completa para la imagen si existe
     const getImageUrl = (path) => {
@@ -15,7 +16,12 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
 
     const handleSave = () => {
         if (!editTitle.trim()) return;
-        onEdit(task.id, { title: editTitle, description: editDescription, priority: editPriority });
+        onEdit(task.id, {
+            title: editTitle,
+            description: editDescription,
+            priority: editPriority,
+            due_date: editDueDate || null
+        });
         setIsEditing(false);
     };
 
@@ -35,15 +41,24 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
                     className="task-edit-desc"
                     rows="2"
                 />
-                <select
-                    value={editPriority}
-                    onChange={(e) => setEditPriority(e.target.value)}
-                    className="priority-select"
-                >
-                    <option value="baja">Baja</option>
-                    <option value="media">Media</option>
-                    <option value="alta">Alta</option>
-                </select>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                    <select
+                        value={editPriority}
+                        onChange={(e) => setEditPriority(e.target.value)}
+                        className="priority-select"
+                    >
+                        <option value="baja">Baja</option>
+                        <option value="media">Media</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                    <input
+                        type="date"
+                        value={editDueDate}
+                        onChange={(e) => setEditDueDate(e.target.value)}
+                        className="task-input-date"
+                        style={{ padding: '8px', borderRadius: '4px', border: '1px solid #444', background: '#222', color: '#fff' }}
+                    />
+                </div>
                 <div className="task-actions">
                     <button onClick={handleSave} className="btn-success">Guardar</button>
                     <button onClick={() => setIsEditing(false)} className="btn-secondary">Cancelar</button>
@@ -83,7 +98,14 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onView }) => {
                         </span>
                     </div>
                     {task.description && <p className="task-desc">{task.description}</p>}
-                    <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
+                    <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginTop: '5px' }}>
+                        <span className="task-date">{new Date(task.created_at).toLocaleDateString()}</span>
+                        {task.due_date && (
+                            <span className="task-due-date" style={{ color: '#ff6b6b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                📅 Vence: {new Date(task.due_date).toLocaleDateString(undefined, { timeZone: 'UTC' })}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 

@@ -50,6 +50,14 @@ const TaskDetailsModal = ({ task, onClose }) => {
                                     {task.is_completed ? 'Completada' : 'Pendiente'}
                                 </span>
                             </div>
+                            {task.due_date && (
+                                <div className="detail-group">
+                                    <label>Vencimiento:</label>
+                                    <span style={{ color: '#ff6b6b', fontWeight: 'bold' }}>
+                                        {new Date(task.due_date).toLocaleDateString(undefined, { timeZone: 'UTC' })}
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="detail-group">
